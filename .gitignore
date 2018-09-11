@@ -1,5 +1,8 @@
-/vendor
-/conf/application.ini
-/composer.lock
+*.DS_Store
 /.idea
-/data
+/vendor
+/coverage
+sftp-config.json
+composer.lock
+.subsplit
+.php_cs.cache

@@ -1,0 +1,20 @@
+{
+    "name": "zithan\/yar-client",
+    "description": "client of yar",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "zithan",
+            "email": "zithan@163.com"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^6.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zithan\\YarClient\\": "src"
+        }
+    }
+}
