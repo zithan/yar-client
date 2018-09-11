@@ -8,7 +8,11 @@ namespace Zithan\YarClient;
 
 class Client
 {
-    protected $baseUri;
+    private $baseUri;
+    private $loopCallback;
+    private $loopErrorCallback;
+    private $countCall = 0;
+    private static $data = [];
 
     public function __construct(string $baseUri)
     {
@@ -17,12 +21,12 @@ class Client
 
     /**
      * 同步串行
+     *
      * @param  string    $uri    [description]
      * @param  array     $params [description]
-     * @param  bool|null $sign   [description]
      * @return [type]            [description]
      */
-    public function one(string $uri, array $params, bool $sign = null)
+    public function one(string $uri, array $params)
     {
         try {
             $client = new \Yar_Client($this->baseUri . $uri);
@@ -30,5 +34,87 @@ class Client
         } catch (\Yar_Server_Exception $e) {
             throw new \Exception($e->getMessage());
         }
+    }
+
+    /**
+     * 异步并行
+     *
+     * @param  string $uri      [description]
+     * @param  array  $params   [description]
+     * @param  [type] $callback [description]
+     * @return [type]           [description]
+     */
+    public function call(string $uri, array $params, $callback = null)
+    {
+        try {
+            return \Yar_Concurrent_Client::call($this->baseUri . $uri, 'run', [$params], $callback);
+        } catch (\Yar_Server_Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    /**
+     * @param string $loopCallback
+     * @param string $loopErrorCallback
+     * @return mixed
+     */
+    public function loop($loopCallback = null, $loopErrorCallback = null)
+    {
+        if ($loopCallback != null) {
+            $this->loopCallback = $loopCallback;
+        }
+
+        if ($loopErrorCallback != null) {
+            $this->loopErrorCallback = $loopErrorCallback;
+        }
+
+        return \Yar_Concurrent_Client::loop([$this, 'clientLoopCallback'], [$this, 'clientLoopErrorCallback']);
+    }
+
+    /**
+     * Clean all registered calls
+     *
+     * @return mixed
+     */
+    public function reset()
+    {
+        return \Yar_Concurrent_Client::reset();
+    }
+
+    /**
+     * 异步并发调用回调
+     * @param $retval
+     * @param $callinfo
+     * @return mixed
+     */
+    public function clientLoopCallback($retval, $callinfo)
+    {
+        if ($this->loopCallback) {
+            if ($callinfo === null) {
+                call_user_func_array($this->loopCallback, [$retval, $callinfo]);
+            } else {
+                self::$data[][$callinfo['uri']] = $retval;
+                if (count(self::$data) == $this->countCall) {
+                    call_user_func_array($this->loopCallback, [self::$data, $callinfo]);
+                } else {
+                    call_user_func_array($this->loopCallback, [$retval, $callinfo]);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $type
+     * @param $error
+     * @param $callinfo
+     * @return mixed
+     */
+    public function clientLoopErrorCallback($type, $error, $callinfo)
+    {
+        if ($this->loopErrorCallback) {
+            return call_user_func_array($this->loopErrorCallback, [$type, $error, $callinfo]);
+        }
+        // 默认处理
+        error_log('发送错误...error_callback...', 0);
     }
 }
