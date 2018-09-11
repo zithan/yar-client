@@ -1,6 +1,7 @@
 {
-    "name": "zithan/z-yar-client",
-    "type": "project",
+    "name": "zithan\/yar-client",
+    "description": "client of yar",
+    "license": "MIT",
     "authors": [
         {
             "name": "zithan",
@@ -8,16 +9,12 @@
         }
     ],
     "require": {
-        "php-di/php-di": "^6.0",
-        "relay/relay": "2.x@dev",
-        "zendframework/zend-diactoros": "^1.7",
-        "middlewares/fast-route": "^1.0",
-        "middlewares/request-handler": "^1.1"
+        "php": "^7.0",
+        "guzzlehttp/guzzle": "^6.3"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Zithan\\Yar\\": "src/"
+            "Zithan\\YarClient\\": "src"
         }
     }
 }
