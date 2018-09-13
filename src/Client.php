@@ -6,6 +6,9 @@
 
 namespace Zithan\YarClient;
 
+use Zithan\YarClient\Exceptions\BaseException;
+use Zithan\YarClient\Exceptions\YarException;
+
 class Client
 {
     private $baseUri;
@@ -25,15 +28,26 @@ class Client
      * @param  string    $uri    [description]
      * @param  array     $params [description]
      * @return [type]            [description]
+     * @throws Yar_Server_Exception | BaseException
      */
     public function one(string $uri, array $params)
     {
         try {
             $client = new \Yar_Client($this->baseUri . $uri);
-            return $client->run($params);
-        } catch (\Yar_Server_Exception $e) {
-            throw new \Exception($e->getMessage());
+            $response = $client->run($params);
+        } catch (\Yar_Server_Exception | \Yar_Client_Exception $e) {
+            throw new YarException($e->getMessage());
         }
+
+        if (!isset($response['errCode'])) {
+            throw new YarException($response);
+        }
+
+        if ($response['errCode'] !== 0) {
+            throw new YarServerException('[errCode]: ' . $response['errCode'] . ' [errMsg]: ' . $response['message']);
+        }
+
+        return $response['data'];
     }
 
     /**
