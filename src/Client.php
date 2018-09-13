@@ -1,5 +1,6 @@
 <?php
-/**
+
+/*
  * Created by zithan.
  * User: zithan <zithan@163.com>
  */
@@ -12,9 +13,13 @@ use Zithan\YarClient\Exceptions\YarException;
 class Client
 {
     private $baseUri;
+
     private $loopCallback;
+
     private $loopErrorCallback;
+
     private $countCall = 0;
+
     private static $data = [];
 
     public function __construct(string $baseUri)
@@ -23,17 +28,19 @@ class Client
     }
 
     /**
-     * 同步串行
+     * 同步串行.
      *
-     * @param  string    $uri    [description]
-     * @param  array     $params [description]
-     * @return [type]            [description]
+     * @param string $uri    [description]
+     * @param array  $params [description]
+     *
+     * @return [type] [description]
+     *
      * @throws Yar_Server_Exception | BaseException
      */
     public function one(string $uri, array $params)
     {
         try {
-            $client = new \Yar_Client($this->baseUri . $uri);
+            $client = new \Yar_Client($this->baseUri.$uri);
             $response = $client->run($params);
         } catch (\Yar_Server_Exception | \Yar_Client_Exception $e) {
             throw new YarException($e->getMessage());
@@ -43,25 +50,26 @@ class Client
             throw new YarException($response);
         }
 
-        if ($response['errCode'] !== 0) {
-            throw new YarServerException('[errCode]: ' . $response['errCode'] . ' [errMsg]: ' . $response['message']);
+        if (0 !== $response['errCode']) {
+            throw new YarServerException('[errCode]: '.$response['errCode'].' [errMsg]: '.$response['message']);
         }
 
         return $response['data'];
     }
 
     /**
-     * 异步并行
+     * 异步并行.
      *
-     * @param  string $uri      [description]
-     * @param  array  $params   [description]
-     * @param  [type] $callback [description]
-     * @return [type]           [description]
+     * @param string $uri      [description]
+     * @param array  $params   [description]
+     * @param [type] $callback [description]
+     *
+     * @return [type] [description]
      */
     public function call(string $uri, array $params, $callback = null)
     {
         try {
-            return \Yar_Concurrent_Client::call($this->baseUri . $uri, 'run', [$params], $callback);
+            return \Yar_Concurrent_Client::call($this->baseUri.$uri, 'run', [$params], $callback);
         } catch (\Yar_Server_Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -70,15 +78,16 @@ class Client
     /**
      * @param string $loopCallback
      * @param string $loopErrorCallback
+     *
      * @return mixed
      */
     public function loop($loopCallback = null, $loopErrorCallback = null)
     {
-        if ($loopCallback != null) {
+        if (null != $loopCallback) {
             $this->loopCallback = $loopCallback;
         }
 
-        if ($loopErrorCallback != null) {
+        if (null != $loopErrorCallback) {
             $this->loopErrorCallback = $loopErrorCallback;
         }
 
@@ -86,7 +95,7 @@ class Client
     }
 
     /**
-     * Clean all registered calls
+     * Clean all registered calls.
      *
      * @return mixed
      */
@@ -96,15 +105,17 @@ class Client
     }
 
     /**
-     * 异步并发调用回调
+     * 异步并发调用回调.
+     *
      * @param $retval
      * @param $callinfo
+     *
      * @return mixed
      */
     public function clientLoopCallback($retval, $callinfo)
     {
         if ($this->loopCallback) {
-            if ($callinfo === null) {
+            if (null === $callinfo) {
                 call_user_func_array($this->loopCallback, [$retval, $callinfo]);
             } else {
                 self::$data[][$callinfo['uri']] = $retval;
@@ -121,6 +132,7 @@ class Client
      * @param $type
      * @param $error
      * @param $callinfo
+     *
      * @return mixed
      */
     public function clientLoopErrorCallback($type, $error, $callinfo)

@@ -1,10 +1,12 @@
 <?php
 
-namespace Zithan\YarClient\Exceptions;
+/*
+ * Created by zithan.
+ * User: zithan <zithan@163.com>
+ */
 
-use Zithan\YarClient\Exceptions\BaseException;
+namespace Zithan\YarClient\Exceptions;
 
 class YarServerException extends BaseException
 {
-
 }
