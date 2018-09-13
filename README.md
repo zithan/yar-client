@@ -2,6 +2,7 @@
 
 <p align="center"> client of yar.</p>
 
+[![Build Status](https://travis-ci.org/zithan/yar-client.svg?branch=master)](https://travis-ci.org/zithan/yar-client)
 
 ## Installing
 
