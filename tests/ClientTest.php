@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * Created by zithan.
+ * User: zithan <zithan@163.com>
+ */
+
 namespace Zithan\YarClient\Tests;
 
 use Mockery\Matcher\AnyArgs;
@@ -12,7 +17,6 @@ class ClientTest extends TestCase
     public function testOne($value = '')
     {
         $response = [
-
         ];
     }
 
