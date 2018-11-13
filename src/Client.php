@@ -42,15 +42,15 @@ class Client
         try {
             $client = new \Yar_Client($this->baseUri . $uri);
             $response = $client->run($params);
+
+            if (!is_array($response) || !isset($response['error_code'])) {
+                throw new YarException(json_encode($response, JSON_UNESCAPED_UNICODE));
+            }
+
+            return $response;
         } catch (\Yar_Server_Exception | \Yar_Client_Exception $e) {
             throw new YarException($e->getMessage());
         }
-
-        if (!isset($response['error_code'])) {
-            throw new YarException(json_encode($response));
-        }
-
-        return $response;
     }
 
     /**
