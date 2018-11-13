@@ -40,21 +40,17 @@ class Client
     public function one(string $uri, array $params)
     {
         try {
-            $client = new \Yar_Client($this->baseUri.$uri);
+            $client = new \Yar_Client($this->baseUri . $uri);
             $response = $client->run($params);
         } catch (\Yar_Server_Exception | \Yar_Client_Exception $e) {
             throw new YarException($e->getMessage());
         }
 
-        if (!isset($response['errCode'])) {
-            throw new YarException($response);
+        if (!isset($response['error_code'])) {
+            throw new YarException(json_encode($response));
         }
 
-        if (0 !== $response['errCode']) {
-            throw new YarServerException('[errCode]: '.$response['errCode'].' [errMsg]: '.$response['message']);
-        }
-
-        return $response['data'];
+        return $response;
     }
 
     /**
@@ -69,7 +65,7 @@ class Client
     public function call(string $uri, array $params, $callback = null)
     {
         try {
-            return \Yar_Concurrent_Client::call($this->baseUri.$uri, 'run', [$params], $callback);
+            return \Yar_Concurrent_Client::call($this->baseUri . $uri, 'run', [$params], $callback);
         } catch (\Yar_Server_Exception $e) {
             throw new \Exception($e->getMessage());
         }
