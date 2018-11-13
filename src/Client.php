@@ -43,8 +43,16 @@ class Client
             $client = new \Yar_Client($this->baseUri . $uri);
             $response = $client->run($params);
 
-            if (!is_array($response) || !isset($response['error_code'])) {
-                throw new YarException(json_encode($response, JSON_UNESCAPED_UNICODE));
+            if (is_object($response)) {
+                $response = $response->getData();
+            }
+
+            if (!is_array($response)) {
+                throw new YarException('response is not array');
+            }
+
+            if (!isset($response['error_code'])) {
+                throw new YarException(sprintf('error_code not found. [response]-->%s', json_encode($response, JSON_UNESCAPED_UNICODE)));
             }
 
             return $response;
