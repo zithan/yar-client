@@ -40,7 +40,7 @@ class Client
     public function one(string $uri, array $params)
     {
         try {
-            $client = new \Yar_Client($this->baseUri . $uri);
+            $client = new \Yar_Client($this->baseUri.$uri);
             $response = $client->run($params);
 
             if (!is_array($response) || !isset($response['error_code'])) {
@@ -65,7 +65,7 @@ class Client
     public function call(string $uri, array $params, $callback = null)
     {
         try {
-            return \Yar_Concurrent_Client::call($this->baseUri . $uri, 'run', [$params], $callback);
+            return \Yar_Concurrent_Client::call($this->baseUri.$uri, 'run', [$params], $callback);
         } catch (\Yar_Server_Exception $e) {
             throw new \Exception($e->getMessage());
         }
