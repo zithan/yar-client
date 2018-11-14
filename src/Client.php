@@ -55,7 +55,7 @@ class Client
         }
 
         if (!isset($response['error_code']) || 0 !== $response['error_code'] || !isset($response['result'])) {
-            throw new YarException(sprintf('error_code is error. [response]-->%s', json_encode($response, JSON_UNESCAPED_UNICODE)));
+            throw new YarException(sprintf('[error response]:%s', json_encode($response, JSON_UNESCAPED_UNICODE)));
         }
 
         return $response['result'];
