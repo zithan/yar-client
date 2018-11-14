@@ -42,23 +42,23 @@ class Client
         try {
             $client = new \Yar_Client($this->baseUri . $uri);
             $response = $client->run($params);
-
-            if (is_object($response)) {
-                $response = $response->getData();
-            }
-
-            if (!is_array($response)) {
-                throw new YarException('response is not array');
-            }
-
-            if (!isset($response['error_code'])) {
-                throw new YarException(sprintf('error_code not found. [response]-->%s', json_encode($response, JSON_UNESCAPED_UNICODE)));
-            }
-
-            return $response;
         } catch (\Yar_Server_Exception | \Yar_Client_Exception $e) {
             throw new YarException($e->getMessage());
         }
+
+        if (is_object($response)) {
+            $response = $response->getData();
+        }
+
+        if (!is_array($response)) {
+            throw new YarException('response is not array');
+        }
+
+        if (!isset($response['error_code']) || 0 !== $response['error_code'] || !isset($response['result'])) {
+            throw new YarException(sprintf('error_code is error. [response]-->%s', json_encode($response, JSON_UNESCAPED_UNICODE)));
+        }
+
+        return $response['result'];
     }
 
     /**
